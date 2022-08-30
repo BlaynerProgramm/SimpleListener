@@ -1,21 +1,26 @@
 ﻿using System.Net;
 using System.Text;
 
+const string STOPWORD = "stop";
+const string URL = "https://192.168.1.61:1111/";
+
 var isWork = true;
 
 using var listener = new HttpListener
 {
-    Prefixes = { "http://192.168.1.61:1111/" }
+    Prefixes = { URL }
 };
 
 listener.Start();
+
+Console.WriteLine($"Listener start work - {URL}");
 
 while (isWork)
 {
     var request = listener.GetContext().Request;
     var text = request.Url!.Query;
    
-    isWork = Check(text);
+    isWork = !IsStopWord(text);
     
     Console.WriteLine($"Received - {text}");
 
@@ -28,7 +33,7 @@ static void LogToFile(string text)
     streamWriter.WriteLine(text);
 }
 
-static bool Check(string text)
+static bool IsStopWord(string text)
 {
-    return text != "?stop";
+    return text == $"?{STOPWORD}";
 }
